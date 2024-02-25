@@ -5,7 +5,9 @@ import axios from "axios";
 
 const BetaPage = () => {
   const [isDeatial, setIsDetail] = useState(false);
-  const [email,setEmail] = useState("");
+  const [email, setEmail] = useState("");
+  const [dots, setDots] = useState("...");
+
   const containerRef = useRef(null);
   const handleCloseClick = (value) => {
     if (value === "open") {
@@ -14,43 +16,67 @@ const BetaPage = () => {
       setIsDetail(false);
     }
   };
+
   useEffect(() => {
-    if(isDeatial){
-    const tl = gsap.timeline({ defaults: { ease: 'power2.inOut' } });
+    const intervalId = setInterval(() => {
+      setDots((prevDots) => {
+        // Rotate the three dots
+        return prevDots === "..." ? "." : prevDots === "." ? ".." : "...";
+      });
+    }, 500); // Change the interval as needed
 
-    tl.fromTo(containerRef.current.children, { opacity: 0, y: 20 }, { opacity: 1, y: 0, stagger: 0.2, duration: 1 });
+    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+  }, []);
+  useEffect(() => {
+    if (isDeatial) {
+      const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
 
-    return () => {
-      tl.kill(); // Kill the animation on unmount
-    };
-  }
+      tl.fromTo(
+        containerRef.current.children,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, stagger: 0.2, duration: 1 }
+      );
+
+      return () => {
+        tl.kill(); // Kill the animation on unmount
+      };
+    }
   }, [isDeatial]);
 
-  const emailHandler = async ()=>{
-    if(!email) return
-    const emailRegex  = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/ig
-    if(!emailRegex.test(email)){
-      console.log("Please show error message here: Provided mail is not a valid mail.")
-      return
+  const emailHandler = async () => {
+    if (!email) return;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/gi;
+    if (!emailRegex.test(email)) {
+      console.log(
+        "Please show error message here: Provided mail is not a valid mail."
+      );
+      return;
     }
-    const data  = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/beta-mail`,{userMail:email})
-    try{
+    const data = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/user/beta-mail`,
+      { userMail: email }
+    );
+    try {
       setEmail("");
-    }catch(err){
-      console.log("err",err)
+    } catch (err) {
+      console.log("err", err);
     }
-    console.log("Show a success message here if the api is responding with 200 else show error message put the condition in try and catch");
-  }
+    console.log(
+      "Show a success message here if the api is responding with 200 else show error message put the condition in try and catch"
+    );
+  };
   return (
     <>
       <div className="navbar">
-        <img src="/projectologo.png" alt="logo" />
+        <img src="/projectoLogo-bg.png" alt="logo" />
       </div>
       {!isDeatial ? (
         <div class="wrapper">
           <div className="content--wrapper">
             <h5 className="pre-head">Projectó</h5>
-            <h1 className="heading">Coming Soon</h1>
+            <h1 className="heading">
+              Coming Soon <span>{dots}</span>
+            </h1>
             <div className="desc">
               <p>
                 Revolutionize project planning effortlessly with our multiple
@@ -71,39 +97,48 @@ const BetaPage = () => {
           <div className="overlay"></div>
         </div>
       ) : (
-          <div className="close-container" ref={containerRef}>
-            <div className="close-container-logo">
-              <span>
-                <img src="/projectologo.png" alt="logo" />
-                Projectó
-              </span>
-              <span
+        <div className="close-container" ref={containerRef}>
+          <div className="close-container-logo">
+            <span
+              onClick={() => {
+                handleCloseClick();
+              }}
+            >
+              <i class="fa-regular fa-circle-xmark"></i>
+            </span>
+          </div>
+          <div className="close-content--wrapper">
+            <div className="close-heading">Get private beta access</div>
+            <div className="close-desc">
+              <p>
+                We invite you to join us on the exciting journey of refining our
+                project planning tools. Your expertise and collaboration will
+                play a pivotal role in enhancing our capabilities. <br />
+              </p>
+            </div>
+            <div className="form-wrapper">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+              />
+              <button
+                className="close-btn--wrapper"
                 onClick={() => {
-                  handleCloseClick();
+                  emailHandler();
                 }}
               >
-                <i class="fa-regular fa-circle-xmark"></i>
-              </span>
+                Join Beta
+              </button>
             </div>
-            <div className="close-content--wrapper">
-              <div className="close-heading">Get private beta access</div>
-              <div className="close-desc">
-                <p>
-                  We invite you to join us on the exciting journey of refining
-                  our project planning tools. Your expertise and collaboration
-                  will play a pivotal role in enhancing our capabilities. <br />{" "}
-                  We look forward to having you onboard for this professional
-                  and impactful endeavor.
-                </p>
-              </div>
-              <div className="form-wrapper">
-                <input type="email" value={email} onChange={(e)=>{
-                  setEmail(e.target.value)
-                }}/>
-                <button className="close-btn--wrapper" onClick={()=>{emailHandler()}}>Join Beta</button>
-              </div>
-            </div>
+            <p>
+              We look forward to having you onboard for this professional and
+              impactful endeavor.
+            </p>
           </div>
+        </div>
       )}
     </>
   );
