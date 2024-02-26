@@ -52,10 +52,7 @@ body {
 
 .overlay {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+inset: 0;
   opacity: 0.3;
 }
 
@@ -122,6 +119,7 @@ body {
 }
 .navbar {
   position: fixed;
+  top: 0;
   z-index: 1;
   width: 100%;
   background-color: #1a1a1a;
@@ -142,25 +140,20 @@ body {
   overflow: hidden;
 }
 .close-container-logo {
-  padding-top: 5%;
+  padding-top: 7%;
   color: #0ad375;
   font-size: 20px;
   display: flex;
-  align-items: center;
-  justify-content: space-around;
+  justify-content: flex-end;
 }
-
-.close-container-logo img {
-  width: 65px;
-  height: 65px;
-  margin-left: 50px;
-}
-.close-container-logo :last-child {
+.close-container-logo span {
   color: white;
   font-size: 30px;
+  align-self: flex-end;
+  margin-right: 150px;
 }
 
-.close-container-logo :last-child :hover {
+.close-container-logo span:hover {
   cursor: pointer;
 }
 .close-heading {
